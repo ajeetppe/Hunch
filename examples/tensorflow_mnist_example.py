@@ -1,7 +1,7 @@
 import os
 from hunchsdk.HunchApi import HunchApi
 
-os.environ["HUNCH_API_CONFIG"]="../config/hunch_api_config.yaml"
+os.environ["HUNCH_API_CONFIG"]="../../../Hunch/config/hunch_api_config.yaml"
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

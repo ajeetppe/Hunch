@@ -7,12 +7,19 @@ import requests
 import hunch_server
 import yaml
 
+os.environ["MODELS_TO_LOAD"] = "[[\"KerasCardPhishingEstimator\", \"1.0.0\"]]"
+
 hunch_server_config = {}
 
-if 'HUNCH_CONFIG' in os.environ:
+if 'HUNCH_CONFIG' in os.environ :
     if os.path.exists(os.environ['HUNCH_CONFIG']):
         with open(os.environ['HUNCH_CONFIG']) as f:
             hunch_server_config = yaml.load(f)
+else:
+    if os.path.exists("../config/hunch_server_config.yaml"):
+        with open("../config/hunch_server_config.yaml") as f:
+            hunch_server_config = yaml.load(f)
+    print("Loading config locally...")
 
 ROTATION_FILE_PATH = hunch_server_config["rotation_status_file"]
 app = Flask(__name__)
@@ -165,3 +172,6 @@ def write_rotation_status(file_path, status):
     file.write(status)
     file.close()
     unlock(lockfd)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=True)

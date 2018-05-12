@@ -1,3 +1,20 @@
+
+
+mkdir -p /tmp/rotation_status /tmp/hunchsdk_custom_libs /tmp/model_repo /tmp/model_resources /tmp/model_repo
 python setup.py sdist && pip install -v --upgrade --no-deps --disable-pip-version-check dist/hunch-0.0.1.tar.gz
 
 gunicorn -b 0.0.0.0:8000 -w 10 --preload --pid model_server.pid  --timeout 300 -e  MODEL_SIZE_THRESHOLD=2000000000 -e HUNCH_CONFIG="../config/hunch_server_config.yaml" -e MODELS_TO_LOAD="[[\"HelloWorldExample\", \"1.0.0\"]]" hunch_server.wsgi:app
+
+gunicorn -b 0.0.0.0:8000 -w 2 --preload --pid model_server.pid  --timeout 300 -e  MODEL_SIZE_THRESHOLD=2000000000 -e HUNCH_CONFIG="../config/hunch_server_config.yaml" -e MODELS_TO_LOAD="[[\"SKLearnExample\", \"1.0.0\"]]" hunch_server.wsgi:app
+
+gunicorn -b 0.0.0.0:8000 -w 10 --preload --pid model_server.pid  --timeout 300 -e  MODEL_SIZE_THRESHOLD=2000000000 -e HUNCH_CONFIG="../config/hunch_server_config.yaml" -e MODELS_TO_LOAD="[[\"TensorflowMnistExample\", \"1.0.0\"]]" hunch_server.wsgi:app
+
+
+gunicorn -b 0.0.0.0:8000 -w 2 --preload --pid model_server.pid  --timeout 300 -e  MODEL_SIZE_THRESHOLD=2000000000 -e HUNCH_CONFIG="../../../Hunch/config/hunch_server_config.yaml" -e MODELS_TO_LOAD="[[\"KerasCardPhishingEstimator\", \"1.0.0\"]]" hunch_server.wsgi:app
+
+
+conda update -f -c conda-forge keras
+pip install tensorflow==1.8.0
+
+
+rm -rf /tmp/model_resources/KerasCardPhishingEstimator_1.0.0 /tmp/model_repo/*
