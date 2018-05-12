@@ -6,6 +6,7 @@ from model_loader import ModelLoader
 import requests
 import hunch_server
 import yaml
+import tensorflow as tf
 
 hunch_server_config = {}
 
@@ -19,6 +20,8 @@ app = Flask(__name__)
 app.logger_name = "hunch.app"
 models_loaded = {}
 model_loader = ModelLoader(hunch_server_config)
+graph = tf.get_default_graph()
+
 try:
     if 'MODELS_TO_LOAD' in os.environ:
         models_to_load = json.loads(os.environ['MODELS_TO_LOAD'])
@@ -126,7 +129,12 @@ def predict():
             response = jsonify({"result":"NA", "stack_trace" : "Model: (%s,%s) doesn't exist. Deploy this model on Hunch " %(model_id, model_version)})
             response.status_code = 400
             return response
-        output = curr_model.predict(input)
+        if "Keras" in model_id:
+            global graph
+            with graph.as_default():
+                output = curr_model.predict(input)
+        else:
+            output = curr_model.predict(input)
         response = jsonify({"result":output,"stack_trace":"NA"})
         response.status_code = 200
         return response
