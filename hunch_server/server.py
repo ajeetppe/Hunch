@@ -6,6 +6,7 @@ from model_loader import ModelLoader
 import requests
 import hunch_server
 import yaml
+import tensorflow as tf
 
 os.environ["MODELS_TO_LOAD"] = "[[\"KerasCardPhishingEstimator\", \"1.0.0\"]]"
 
@@ -35,7 +36,7 @@ except requests.exceptions.HTTPError as e:
     app.logger.error("Meta Service has thrown %s, the error is %s and stack trace is %s"
                      %(e.response.status_code, e.message, str(traceback.format_exc())))
     raise RuntimeError("Meta Service has thrown '{}' , the error is {} and stack trace is {}".format(e.response.status_code, e.message, str(traceback.format_exc())))
-
+graph = tf.get_default_graph()
 app.logger.info("Loaded models are: " + json.dumps(models_loaded.keys()))
 
 @app.route('/elb-healthcheck', methods=['GET'])
@@ -133,7 +134,10 @@ def predict():
             response = jsonify({"result":"NA", "stack_trace" : "Model: (%s,%s) doesn't exist. Deploy this model on Hunch " %(model_id, model_version)})
             response.status_code = 400
             return response
-        output = curr_model.predict(input)
+        global graph
+        with graph.as_default():
+            output = curr_model.predict(input)
+        #output = curr_model.predict(input)
         response = jsonify({"result":output,"stack_trace":"NA"})
         response.status_code = 200
         return response
